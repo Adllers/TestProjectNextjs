@@ -1,7 +1,8 @@
-import { Box, Flex, SimpleGrid, Text, Heading, Image } from "@chakra-ui/react";
+import { Box, Flex, SimpleGrid, Text, Heading, Image, Button, Icon, Stack, useToast } from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { SideBar } from "../components/Sidebar";
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, useCallback } from 'react'; 
+import { BsHeartFill } from 'react-icons/bs'
 
 interface ProductProps {
     id: number;
@@ -14,6 +15,8 @@ interface ProductProps {
 export default function Home() {
 
   const [products, setProducts] = useState<ProductProps[]>([]);
+
+  const toast = useToast();
 
   useEffect(() => {
 
@@ -31,6 +34,39 @@ export default function Home() {
     getAllProducts();
 
   }, []);
+
+
+  const favoriteProduct = useCallback(async (product: ProductProps ) => {
+
+    try {
+        
+        console.log(product);
+
+        const info = {
+            method: "POST",
+            body: JSON.stringify(product),
+        };
+
+        await fetch('/api/favorites', info);
+        
+        toast({
+            title: 'Favoritado!',
+            description: `O Produto ${product.name} foi adicionado a sua lista de favoritos!`,
+            status: 'success',
+            duration: 8000,
+            isClosable: true,
+        });
+       
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+  },[]);
+
+
+  
 
   return (
     <Flex direction="column" h="100vh">
@@ -52,10 +88,13 @@ export default function Home() {
                     >
 
                         <Flex justify='center' align='center'>
-                            <Box as='article' maxW='sm' p='12' borderWidth='1px' rounded='md'>
+                            <Box as='article' maxW='sm' p='12' borderWidth='1px' borderRadius='lg' rounded='md'>
 
-                                <Box  fontSize="20" fontWeight='bold' justifyContent="center" alignItems="center">
+                                <Box  display='flex' flexDirection='row' justifyContent='space-between' fontSize="20" fontWeight='bold'  alignItems="baseline" >
                                         { product.name }
+                                        <Box >
+                                            <Box as="button" onClick={() => favoriteProduct(product)}  ><Icon as={BsHeartFill} color={"blue.400"} fontSize={30}/></Box>
+                                        </Box>
                                 </Box>
 
                                 <Heading size='md' my='2'>
@@ -88,3 +127,5 @@ export default function Home() {
     </Flex>
   )  
 }
+
+
