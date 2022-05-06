@@ -18,6 +18,6 @@ export default function Favorites(req, res) {
             favorites.push(productFavorite);
         }
         
-        res.status(200).send();
+        res.status(200).json(favorites);
     }
 }

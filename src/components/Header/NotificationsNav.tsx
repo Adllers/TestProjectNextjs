@@ -1,5 +1,6 @@
-import { HStack, Icon } from "@chakra-ui/react";
+import { HStack, Icon, Box, Link } from "@chakra-ui/react";
 import { RiShoppingCartLine, RiUser3Line } from "react-icons/ri";
+import { BsHeartFill } from "react-icons/bs";
 
 
 export default function NotificationNav() {
@@ -16,8 +17,12 @@ export default function NotificationNav() {
             borderRightWidth={1}
             borderColor="gray.700"
 
-        >
-            <Icon as={RiUser3Line} fontSize="20"/> 
+        >   
+            <Link href="/favorites">
+                <Box as="button">
+                    <Icon as={BsHeartFill} color={"blue.400"} fontSize="20"/>
+                </Box> 
+            </Link>
             <Icon as={RiShoppingCartLine} fontSize="20"/>
         </HStack>
 

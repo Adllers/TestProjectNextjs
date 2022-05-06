@@ -15,6 +15,7 @@ interface ProductProps {
 export default function Home() {
 
   const [products, setProducts] = useState<ProductProps[]>([]);
+  const [myFavorites, setFavorites] = useState<ProductProps[]>([]);
 
   const toast = useToast();
 
@@ -22,11 +23,24 @@ export default function Home() {
 
     const getAllProducts = async () => {
         
-        let response = await fetch('/api/products').then(resp => resp.json());
+        let productsList = await fetch('/api/products').then(resp => resp.json());
             
-        if (response) {
-            setProducts(response);
+        if (productsList) {
+            setProducts(productsList);
         }  
+
+        let favoritesProductsList = await fetch('/api/favorites').then(resp => resp.json());
+
+        console.log(favoritesProductsList);
+
+        if (favoritesProductsList.length > 0) {
+            setFavorites(favoritesProductsList);
+        } else {
+
+           let content = localStorage.getItem('favoritesProductsList');
+           let favorites = JSON.parse(content);
+           setFavorites(favorites);
+        }
 
         console.log(products);
     }
@@ -40,22 +54,28 @@ export default function Home() {
 
     try {
         
-        console.log(product);
-
         const info = {
             method: "POST",
             body: JSON.stringify(product),
         };
 
-        await fetch('/api/favorites', info);
+        const responseFavorites = await fetch('/api/favorites', info).then(resp => resp.json());
         
-        toast({
-            title: 'Favoritado!',
-            description: `O Produto ${product.name} foi adicionado a sua lista de favoritos!`,
-            status: 'success',
-            duration: 8000,
-            isClosable: true,
-        });
+        const jsonResponseFavorites = JSON.stringify(responseFavorites);
+
+        localStorage.setItem('favoritesProductsList', jsonResponseFavorites);
+        
+        if (responseFavorites.length != 3) {
+
+            toast({
+                title: 'Favoritado!',
+                description: `O Produto ${product.name} foi adicionado a sua lista de favoritos!`,
+                status: 'success',
+                duration: 8000,
+                isClosable: true,
+            });
+
+        } 
        
     } catch (error) {
 
