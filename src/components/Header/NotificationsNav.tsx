@@ -1,6 +1,6 @@
-import { HStack, Icon, Box, Link } from "@chakra-ui/react";
-import { RiShoppingCartLine, RiUser3Line } from "react-icons/ri";
-import { BsHeartFill } from "react-icons/bs";
+import { HStack, Icon, Box } from "@chakra-ui/react";
+import { RiShoppingCartLine } from "react-icons/ri";
+import { GiHeartStake } from "react-icons/gi";
 
 
 export default function NotificationNav() {
@@ -18,11 +18,11 @@ export default function NotificationNav() {
             borderColor="gray.700"
 
         >   
-            <Link href="/favorites">
-                <Box as="button">
-                    <Icon as={BsHeartFill} color={"blue.400"} fontSize="20"/>
-                </Box> 
-            </Link>
+            
+
+            <Box as="button" marginTop={2}>
+                <Icon as={GiHeartStake} color={"blue.400"} fontSize="20"/>
+            </Box> 
             <Icon as={RiShoppingCartLine} fontSize="20"/>
         </HStack>
 

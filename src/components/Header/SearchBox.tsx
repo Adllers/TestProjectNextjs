@@ -31,7 +31,7 @@ export default function SearchBox() {
                 variant="unstyled"
                 px="4"
                 mr="4"
-                placeholder="Buscar na Plataforma"
+                placeholder="Buscar na Loja"
                 _placeholder={{ color: 'gray.400'}}
                 // Se usássemos Controlled Components
                 // value={search}

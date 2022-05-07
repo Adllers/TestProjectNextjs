@@ -1,8 +1,10 @@
-import { Box, Flex, SimpleGrid, Text, Heading, Image, Button, Icon, Stack, useToast } from "@chakra-ui/react";
+import { Box, Flex, SimpleGrid, Text, Heading, Image, Button, Icon, Stack, Link, Center} from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { SideBar } from "../components/Sidebar";
 import { useState, useEffect, useCallback } from 'react'; 
 import { BsHeartFill } from 'react-icons/bs'
+import { GiHeartStake } from 'react-icons/gi'
+import { Fragment } from "react"
 
 interface ProductProps {
     id: number;
@@ -10,42 +12,54 @@ interface ProductProps {
     imageURL: string;
     listPrice: number;
     salePrice: number;
+    favorite: boolean;
 }
 
-export default function Home() {
+export async function getStaticProps() {
 
-  const [products, setProducts] = useState<ProductProps[]>([]);
-  const [myFavorites, setFavorites] = useState<ProductProps[]>([]);
+    const getProducts = {
+        method: "GET",
+    };
 
-  const toast = useToast();
+    const apiProducts = await fetch('http://localhost:3000/api/products', getProducts).then(resp => resp.json());
 
-  useEffect(() => {
 
-    const getAllProducts = async () => {
-        
-        let productsList = await fetch('/api/products').then(resp => resp.json());
-            
-        if (productsList) {
-            setProducts(productsList);
-        }  
+        return {
 
-        let favoritesProductsList = await fetch('/api/favorites').then(resp => resp.json());
+            revalidate: 30,
 
-        console.log(favoritesProductsList);
-
-        if (favoritesProductsList.length > 0) {
-            setFavorites(favoritesProductsList);
-        } else {
-
-           let content = localStorage.getItem('favoritesProductsList');
-           let favorites = JSON.parse(content);
-           setFavorites(favorites);
+            props: {
+                apiProducts,
+                teste: Math.random()
+            }
         }
 
-        console.log(products);
-    }
+}
 
-    getAllProducts();
+export default function Home(props) {
+
+  const [products, setProducts] = useState<ProductProps[]>([]);
+
+  const { apiProducts } = props;
+
+  const { teste } = props;
+ 
+  
+  useEffect(() => {
+
+    // const getAllProducts = async () => {
+        
+    //     let productsList = await fetch('/api/products').then(resp => resp.json());
+        
+    //     if (productsList) {
+    //         setProducts(productsList);
+    //     }   
+
+    // }
+
+    // getAllProducts();
+
+    setProducts(apiProducts);
 
   }, []);
 
@@ -53,30 +67,19 @@ export default function Home() {
   const favoriteProduct = useCallback(async (product: ProductProps ) => {
 
     try {
+
+        product.favorite = !product.favorite;
         
-        const info = {
-            method: "POST",
+        const update = {
+            method: "PUT",
             body: JSON.stringify(product),
         };
 
-        const responseFavorites = await fetch('/api/favorites', info).then(resp => resp.json());
+        const newListProducts = await fetch('/api/products', update).then(resp => resp.json());
         
-        const jsonResponseFavorites = JSON.stringify(responseFavorites);
+        setProducts(newListProducts);
 
-        localStorage.setItem('favoritesProductsList', jsonResponseFavorites);
-        
-        if (responseFavorites.length != 3) {
-
-            toast({
-                title: 'Favoritado!',
-                description: `O Produto ${product.name} foi adicionado a sua lista de favoritos!`,
-                status: 'success',
-                duration: 8000,
-                isClosable: true,
-            });
-
-        } 
-       
+    
     } catch (error) {
 
         console.log(error);
@@ -86,21 +89,21 @@ export default function Home() {
   },[]);
 
 
-  
-
   return (
+
     <Flex direction="column" h="100vh">
         <Header />
 
         <Flex w="100%" my="6" maxWidth={1480} mx="auto" px="6">
-            <SideBar/>
 
+            <SideBar/>
+            
             <SimpleGrid flex="1" gap="4" minChildWidth="320px" alignItems="flex-start">
 
-
-                {products.map(product => (
+                {products?.map(product => (
 
                     <Box
+                        key={`${product.id}-${product.imageURL}`}
                         p={["6","8"]}
                         bg="gray.800"
                         borderRadius={8}
@@ -113,7 +116,16 @@ export default function Home() {
                                 <Box  display='flex' flexDirection='row' justifyContent='space-between' fontSize="20" fontWeight='bold'  alignItems="baseline" >
                                         { product.name }
                                         <Box >
-                                            <Box as="button" onClick={() => favoriteProduct(product)}  ><Icon as={BsHeartFill} color={"blue.400"} fontSize={30}/></Box>
+                                            <Box as="button" onClick={() => favoriteProduct(product)} >
+                                                
+                                                {product.favorite == true
+                                                    ?
+                                                    <Icon as={GiHeartStake} color={"blue.400"} fontSize={30}/>
+                                                    :
+                                                    <Icon as={BsHeartFill} color={"blue.400"} fontSize={30}/>
+                                                }
+
+                                            </Box>
                                         </Box>
                                 </Box>
 
@@ -143,7 +155,17 @@ export default function Home() {
                 
 
             </SimpleGrid>
+            
+            
         </Flex>
+            <Center flexDirection='column'>                                  
+                <Box>
+                    It is just a test! Static Page for 30 seconds: <Text color={"blue.400"}>{teste}</Text>
+                </Box>
+                <Box>
+                    Code at Github: <Text color={"blue.400"}><Link href='https://github.com/Adllers/TestProjectNextjs'>https://github.com/Adllers/TestProjectNextjs </Link></Text>  
+                </Box>
+            </Center>
     </Flex>
   )  
 }
