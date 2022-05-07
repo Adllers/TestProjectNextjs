@@ -1,10 +1,9 @@
-import { Box, Flex, SimpleGrid, Text, Heading, Image, Button, Icon, Stack, Link, Center} from "@chakra-ui/react";
+import { Box, Flex, SimpleGrid, Text, Heading, Image, Icon, Link, Center} from "@chakra-ui/react";
 import { Header } from "../components/Header";
 import { SideBar } from "../components/Sidebar";
 import { useState, useEffect, useCallback } from 'react'; 
 import { BsHeartFill } from 'react-icons/bs'
 import { GiHeartStake } from 'react-icons/gi'
-import { Fragment } from "react"
 
 interface ProductProps {
     id: number;
@@ -47,21 +46,9 @@ export default function Home(props) {
   
   useEffect(() => {
 
-    // const getAllProducts = async () => {
-        
-    //     let productsList = await fetch('/api/products').then(resp => resp.json());
-        
-    //     if (productsList) {
-    //         setProducts(productsList);
-    //     }   
-
-    // }
-
-    // getAllProducts();
-
     setProducts(apiProducts);
-
-  }, []);
+    
+  }, [apiProducts]);
 
 
   const favoriteProduct = useCallback(async (product: ProductProps ) => {
